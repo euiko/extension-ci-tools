@@ -65,6 +65,11 @@ on:
         required: false
         type: string
         default: ""
+      # The git submodules used for the override_repository
+      override_submodules:
+        required: false
+        type: string
+        default: "true"
       # Override the repo for the CI tools (for testing CI tools itself)
       override_ci_tools_repository:
         required: false
@@ -122,19 +127,19 @@ jobs:
           repository: ${{ inputs.override_repository }}
           ref: ${{ inputs.override_ref }}
           fetch-depth: 0
-          submodules: 'true'
+          submodules: "${{ inputs.override_submodules }}"
 
       - uses: actions/checkout@v4
         name: Checkout current repository
         if: ${{inputs.override_repository == ''}}
         with:
           fetch-depth: 0
-          submodules: 'true'
+          submodules: "true"
 
       - uses: actions/checkout@v4
         name: Checkout Extension CI tools
         with:
-          path: 'extension-ci-tools'
+          path: "extension-ci-tools"
           ref: ${{ inputs.ci_tools_version }}
           repository: ${{ inputs.override_ci_tools_repository }}
 
@@ -225,19 +230,19 @@ jobs:
           repository: ${{ inputs.override_repository }}
           ref: ${{ inputs.override_ref }}
           fetch-depth: 0
-          submodules: 'true'
+          submodules: "${{ inputs.override_submodules }}"
 
       - uses: actions/checkout@v4
         name: Checkout current repository
         if: ${{inputs.override_repository == ''}}
         with:
           fetch-depth: 0
-          submodules: 'true'
+          submodules: "true"
 
       - uses: actions/checkout@v4
         name: Checkout Extension CI tools
         with:
-          path: 'extension-ci-tools'
+          path: "extension-ci-tools"
           ref: ${{ inputs.ci_tools_version }}
           repository: ${{ inputs.override_ci_tools_repository }}
 
@@ -259,7 +264,7 @@ jobs:
       - uses: actions/checkout@v4
         name: Checkout Extension CI tools
         with:
-          path: 'extension-ci-tools'
+          path: "extension-ci-tools"
           ref: ${{ inputs.ci_tools_version }}
           repository: ${{ inputs.override_ci_tools_repository }}
           fetch-depth: 0
@@ -277,7 +282,7 @@ jobs:
       - name: Create env file for docker
         run: |
           touch docker_env.txt
-          echo "VCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }}" >> docker_env.txt 
+          echo "VCPKG_TARGET_TRIPLET=${{ matrix.vcpkg_triplet }}" >> docker_env.txt
           echo "BUILD_SHELL=${{ inputs.build_duckdb_shell && '1' || '0' }}" >> docker_env.txt
           echo "OPENSSL_ROOT_DIR=/duckdb_build_dir/build/release/vcpkg_installed/${{ matrix.vcpkg_triplet }}" >> docker_env.txt
           echo "OPENSSL_DIR=/duckdb_build_dir/build/release/vcpkg_installed/${{ matrix.vcpkg_triplet }}" >> docker_env.txt
@@ -322,7 +327,7 @@ jobs:
       - name: Print Rust logs
         if: ${{ inputs.rust_logs && (inputs.enable_rust || contains(format(';{0};', inputs.extra_toolchains), ';rust;')) }}
         run: |
-          for filename in build/release/rust/src/*/*build-*.log; do 
+          for filename in build/release/rust/src/*/*build-*.log; do
             echo Printing logs for file $filename
             cat $filename;
             echo Done printing logs for $filename
@@ -351,14 +356,14 @@ jobs:
           repository: ${{ inputs.override_repository }}
           ref: ${{ inputs.override_ref }}
           fetch-depth: 0
-          submodules: 'true'
+          submodules: "${{ inputs.override_submodules }}"
 
       - uses: actions/checkout@v4
         name: Checkout current repository
         if: ${{inputs.override_repository == ''}}
         with:
           fetch-depth: 0
-          submodules: 'true'
+          submodules: "true"
 
       - name: Install Ninja
         run: |
@@ -372,12 +377,12 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - uses: actions/checkout@v4
         name: Checkout Extension CI tools
         with:
-          path: 'extension-ci-tools'
+          path: "extension-ci-tools"
           ref: ${{ inputs.ci_tools_version }}
           repository: ${{ inputs.override_ci_tools_repository }}
 
@@ -407,11 +412,11 @@ jobs:
         run: |
           rustup target add x86_64-apple-darwin
 
-      - name: 'Setup go'
+      - name: "Setup go"
         if: ${{ (inputs.enable_go || contains(format(';{0};', inputs.extra_toolchains), ';go;'))}}
         uses: actions/setup-go@v4
         with:
-          go-version: '1.23'
+          go-version: "1.23"
 
       - name: Install parser tools
         if: ${{ contains(format(';{0};', inputs.extra_toolchains), ';parser_tools;')}}
@@ -468,7 +473,7 @@ jobs:
       - name: Print Rust logs
         if: ${{ inputs.rust_logs && (inputs.enable_rust || contains(format(';{0};', inputs.extra_toolchains), ';rust;')) }}
         run: |
-          for filename in build/release/rust/src/*/*build-*.log; do 
+          for filename in build/release/rust/src/*/*build-*.log; do
             echo Printing logs for file $filename
             cat $filename;
             echo Done printing logs for $filename
@@ -503,28 +508,28 @@ jobs:
           repository: ${{ inputs.override_repository }}
           ref: ${{ inputs.override_ref }}
           fetch-depth: 0
-          submodules: 'true'
+          submodules: "${{ inputs.override_submodules }}"
 
       - uses: actions/checkout@v4
         name: Checkout current repository
         if: ${{inputs.override_repository == ''}}
         with:
           fetch-depth: 0
-          submodules: 'true'
+          submodules: "true"
 
       - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.11"
 
       - name: Setup Rust
         if: (inputs.enable_rust || contains(format(';{0};', inputs.extra_toolchains), ';rust;'))
         uses: dtolnay/rust-toolchain@stable
 
-      - name: 'Setup go'
+      - name: "Setup go"
         if: ${{ (inputs.enable_go || contains(format(';{0};', inputs.extra_toolchains), ';go;'))}}
         uses: actions/setup-go@v4
         with:
-          go-version: '1.23'
+          go-version: "1.23"
 
       - name: Install parser tools
         if: ${{ contains(format(';{0};', inputs.extra_toolchains), ';parser_tools;')}}
@@ -534,21 +539,21 @@ jobs:
       - uses: r-lib/actions/setup-r@v2
         if: matrix.duckdb_arch == 'windows_amd64_rtools'
         with:
-          r-version: 'devel'
+          r-version: "devel"
           update-rtools: true
-          rtools-version: '42' # linker bug in 43
+          rtools-version: "42" # linker bug in 43
 
       - name: setup rtools gcc for vcpkg
         if: matrix.duckdb_arch == 'windows_amd64_rtools'
         run: |
-          cp C:/rtools42/x86_64-w64-mingw32.static.posix/bin/gcc.exe C:/rtools42/x86_64-w64-mingw32.static.posix/bin/x86_64-w64-mingw32-gcc.exe 
-          cp C:/rtools42/x86_64-w64-mingw32.static.posix/bin/g++.exe C:/rtools42/x86_64-w64-mingw32.static.posix/bin/x86_64-w64-mingw32-g++.exe 
-          cp C:/rtools42/x86_64-w64-mingw32.static.posix/bin/gfortran.exe C:/rtools42/x86_64-w64-mingw32.static.posix/bin/x86_64-w64-mingw32-gfortran.exe 
+          cp C:/rtools42/x86_64-w64-mingw32.static.posix/bin/gcc.exe C:/rtools42/x86_64-w64-mingw32.static.posix/bin/x86_64-w64-mingw32-gcc.exe
+          cp C:/rtools42/x86_64-w64-mingw32.static.posix/bin/g++.exe C:/rtools42/x86_64-w64-mingw32.static.posix/bin/x86_64-w64-mingw32-g++.exe
+          cp C:/rtools42/x86_64-w64-mingw32.static.posix/bin/gfortran.exe C:/rtools42/x86_64-w64-mingw32.static.posix/bin/x86_64-w64-mingw32-gfortran.exe
 
       - uses: actions/checkout@v4
         name: Checkout Extension CI tools
         with:
-          path: 'extension-ci-tools'
+          path: "extension-ci-tools"
           ref: ${{ inputs.ci_tools_version }}
           repository: ${{ inputs.override_ci_tools_repository }}
 
@@ -616,7 +621,7 @@ jobs:
         if: ${{ inputs.rust_logs && (inputs.enable_rust || contains(format(';{0};', inputs.extra_toolchains), ';rust;')) }}
         shell: bash
         run: |
-          for filename in build/release/rust/src/*/*build-*.log; do 
+          for filename in build/release/rust/src/*/*build-*.log; do
             echo Printing logs for file $filename
             cat $filename;
             echo Done printing logs for $filename
@@ -642,19 +647,19 @@ jobs:
           repository: ${{ inputs.override_repository }}
           ref: ${{ inputs.override_ref }}
           fetch-depth: 0
-          submodules: 'true'
+          submodules: "${{ inputs.override_submodules }}"
 
       - uses: actions/checkout@v4
         name: Checkout current repository
         if: ${{inputs.override_repository == ''}}
         with:
           fetch-depth: 0
-          submodules: 'true'
+          submodules: "true"
 
       - uses: actions/checkout@v4
         name: Checkout Extension CI tools
         with:
-          path: 'extension-ci-tools'
+          path: "extension-ci-tools"
           ref: ${{ inputs.ci_tools_version }}
           repository: ${{ inputs.override_ci_tools_repository }}
 
@@ -675,7 +680,7 @@ jobs:
 
       - uses: mymindstorm/setup-emsdk@v13
         with:
-          version: 'latest'
+          version: "latest"
 
       - name: Setup Rust for cross compilation
         if: ${{ (inputs.enable_rust || contains(format(';{0};', inputs.extra_toolchains), ';rust;'))}}
@@ -683,11 +688,11 @@ jobs:
         with:
           targets: wasm32-unknown-emscripten
 
-      - name: 'Setup go'
+      - name: "Setup go"
         if: ${{ (inputs.enable_go || contains(format(';{0};', inputs.extra_toolchains), ';go;'))}}
         uses: actions/setup-go@v4
         with:
-          go-version: '1.23'
+          go-version: "1.23"
 
       - name: Setup vcpkg
         uses: lukka/run-vcpkg@v11.1
@@ -722,7 +727,7 @@ jobs:
         if: ${{ inputs.rust_logs && (inputs.enable_rust || contains(format(';{0};', inputs.extra_toolchains), ';rust;')) }}
         shell: bash
         run: |
-          for filename in build/release/rust/src/*/*build-*.log; do 
+          for filename in build/release/rust/src/*/*build-*.log; do
             echo Printing logs for file $filename
             cat $filename;
             echo Done printing logs for $filename
